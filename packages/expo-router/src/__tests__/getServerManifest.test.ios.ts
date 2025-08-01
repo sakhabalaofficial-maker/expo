@@ -600,3 +600,33 @@ it(`matches top-level catch-all before +not-found route`, () => {
     ).toBe(page);
   }
 });
+
+it(`marks routes with loader functions as hasLoader: true`, () => {
+  // TODO(@hassankhan): Come up with a better way to mock this
+  const contextModule = createMockContextModule({
+    './index.js': {
+      default() {},
+      loader() {},
+    },
+    './blog/[id].js': {
+      default() {},
+      loader() {},
+    },
+  });
+
+  const manifest = getServerManifest(getExactRoutes(contextModule, { preserveApiRoutes: true }));
+
+  const indexRoute = manifest.htmlRoutes.find((r) => r.file === './index.js');
+  expect(indexRoute).toMatchObject({
+    file: './index.js',
+    page: '/index',
+    hasLoader: true,
+  });
+
+  const blogRoute = manifest.htmlRoutes.find((r) => r.file === './blog/[id].js');
+  expect(blogRoute).toMatchObject({
+    file: './blog/[id].js',
+    page: '/blog/[id]',
+    hasLoader: true,
+  });
+});

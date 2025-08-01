@@ -101,6 +101,8 @@ async function loadStaticParamsRecursive(
         ...route,
         // TODO: Add a new field for this
         contextKey: generatedContextKey,
+        destinationContextKey: route.contextKey, // Point to original dynamic route
+        generated: true, // Mark as generated
         // Convert the dynamic route to a static route.
         dynamic: null,
         route: parsedRoute,

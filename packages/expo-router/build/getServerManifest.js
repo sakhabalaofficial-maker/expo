@@ -81,7 +81,7 @@ function getServerManifest(route) {
 }
 function getMatchableManifestForPaths(paths) {
     return paths.map(([normalizedRoutePath, absoluteRoute, node]) => {
-        const matcher = getNamedRouteRegex(normalizedRoutePath, absoluteRoute, node.contextKey);
+        const matcher = getNamedRouteRegex(normalizedRoutePath, absoluteRoute, node.destinationContextKey || node.contextKey);
         if (node.generated) {
             matcher.generated = true;
         }
@@ -90,6 +90,18 @@ function getMatchableManifestForPaths(paths) {
         }
         if (node.methods) {
             matcher.methods = node.methods;
+        }
+        if (node.loadRoute) {
+            try {
+                const loaded = node.loadRoute();
+                if (loaded.loader) {
+                    matcher.hasLoader = true;
+                }
+            }
+            catch {
+                // TODO(@hassankhan): Maybe we should throw an error here?
+                // Ignore errors when loading route for loader detection
+            }
         }
         return matcher;
     });
